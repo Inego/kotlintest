@@ -423,6 +423,26 @@ infix fun <T> Collection<T>.shouldContainAll(ts: Collection<T>) = this should co
 infix fun <T> Array<T>.shouldNotContainAll(ts: Collection<T>) = asList().shouldNotContainAll(ts)
 infix fun <T> Collection<T>.shouldNotContainAll(ts: Collection<T>) = this shouldNot containAll(ts)
 
+fun <T> Array<T>.shouldContainAny(vararg ts: T) = asList().shouldContainAny(ts)
+fun <T> Collection<T>.shouldContainAny(vararg ts: T) = this should containAny(ts.asList())
+fun <T> Array<T>.shouldNotContainAny(vararg ts: T) = asList().shouldNotContainAny(ts)
+fun <T> Collection<T>.shouldNotContainAny(vararg ts: T) = this shouldNot containAny(ts.asList())
+infix fun <T> Array<T>.shouldContainAny(ts: Collection<T>) = asList().shouldContainAny(ts)
+infix fun <T> Collection<T>.shouldContainAny(ts: Collection<T>) = this should containAny(ts)
+infix fun <T> Array<T>.shouldNotContainAny(ts: Collection<T>) = asList().shouldNotContainAny(ts)
+infix fun <T> Collection<T>.shouldNotContainAny(ts: Collection<T>) = this shouldNot containAny(ts)
+
+fun <T> containAny(ts: Collection<T>) = object : Matcher<Collection<T>> {
+  override fun test(value: Collection<T>): MatcherResult {
+    if (ts.isEmpty()) throwEmptyCollectionError()
+    return MatcherResult(
+            ts.any { it in value },
+            { "Collection should contain any of ${ts.joinToString(separator = ", ", limit = 10) { stringRepr(it) }}" },
+            { "Collection should not contain any of ${ts.joinToString(separator = ", ", limit = 10) { stringRepr(it) }}" }
+    )
+  }
+}
+
 
 /**
  * Verifies that this instance is in [collection]
